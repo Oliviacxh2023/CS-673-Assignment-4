@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #weather-info {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Weather App</h1>
+    <input type="text" id="city-input" placeholder="Enter city name">
+    <button onclick="getWeather()">Get Weather</button>
+    <div id="weather-info"></div>
+
+    <script>
+        function getWeather() {
+            var city = document.getElementById("city-input").value;
+            var apiKey = "fb58a72d766c671bbcbf022bfa6e37fa";
+            var url = "http://api.openweathermap.org/geo/1.0/direct?q=" + city + "&limit=5&appid=" + apiKey;
+
+            fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    var lat = data[0].lat;
+                    var lon = data[0].lon;
+                    var weatherUrl = "https://api.openweathermap.org/data/3.0/onecall?lat=" + lat + "&lon=" + lon + "&appid=" + apiKey;
+
+                    fetch(weatherUrl)
+                    .then(response => response.json())
+                    .then(weatherData => {
+                        var currentWeather = weatherData.current;
+                        var tempCelsius = Math.round(currentWeather.temp - 273.15);
+                        var tempFahrenheit = Math.round((tempCelsius * 9/5) + 32);
+                        var feelsLikeCelsius = Math.round(currentWeather.feels_like - 273.15);
+                        var feelsLikeFahrenheit = Math.round((feelsLikeCelsius * 9/5) + 32);
+                        var weatherDescription = currentWeather.weather[0].description;
+
+                        var weatherInfoDiv = document.getElementById("weather-info");
+                        weatherInfoDiv.innerHTML = "<p>Temperature: " + tempCelsius + "°C / " + tempFahrenheit + "°F</p>" + 
+                        "<p>Feels like: " + feelsLikeCelsius + "°C / " + feelsLikeFahrenheit + "°F</p>" +
+                        "<p>Description: " + weatherDescription + "</p>";
+                    })
+                    .catch(error => console.log("Error fetching weather data: ", error));
+                } else {
+                    alert("City not found. Please enter a valid city name.");
+                }
+            })
+            .catch(error => console.log("Error fetching city data: ", error));
+        }
+    </script>
+</body>
+</html>
