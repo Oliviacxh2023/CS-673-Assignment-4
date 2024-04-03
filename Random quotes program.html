@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Quote Program</title>
+</head>
+<body>
+    <h1>Random Quote Program</h1>
+    <button onclick="fetchRandomQuote()">Get Random Quote</button>
+    <div id="randomResult"></div>
+    <div>
+        <input type="text" id="searchInput" placeholder="Search by author or keyword">
+        <button onclick="searchQuote()">Search</button>
+    </div>
+    <div id="searchResult"></div>
+
+    <script>
+        function fetchRandomQuote() {
+            const script = document.createElement('script');
+            script.src = 'https://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=jsonp&jsonp=displayRandomResult';
+            document.body.appendChild(script);
+        }
+
+        function displayRandomResult(data) {
+            const randomResultDiv = document.getElementById('randomResult');
+            randomResultDiv.innerHTML = `<p>"${data.quoteText}"</p><p>- ${data.quoteAuthor}</p>`;
+            randomResultDiv.style.marginTop = "20px";
+        }
+
+        function searchQuote() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            if (searchTerm === '') {
+                document.getElementById('searchResult').innerHTML = 'Please enter a keyword or author name.';
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = `https://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=jsonp&jsonp=displaySearchResult&key=${encodeURIComponent(searchTerm)}`;
+            document.body.appendChild(script);
+        }
+
+        function displaySearchResult(data) {
+            if (data.quoteText) {
+                document.getElementById('searchResult').innerHTML = `<p>"${data.quoteText}"</p><p>- ${data.quoteAuthor}</p>`;
+            } else {
+                document.getElementById('searchResult').innerHTML = 'No quotes found for the given search term.';
+            }
+        }
+    </script>
+</body>
+</html>
